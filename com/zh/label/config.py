@@ -1,6 +1,6 @@
 class config:
     # 本地计算机名称,需要调用本地的浏览器进行访问
-    local_user_name: str = 'han.zhou'
+    local_user_name: str = '朝菌'
     # 初始url
     ethscan_label_base_url: str = 'https://etherscan.io'
     # Accept 头信息

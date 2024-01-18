@@ -80,14 +80,14 @@ def change_df_style(wait_df):
 
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
-	ethscan_all_label = get_ethscan_all_label()
-	print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
-	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	# ethscan_all_label = get_ethscan_all_label()
+	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
+	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
 
-	# web_driver = get_selenium_driver()
-	# web_driver.get("https://etherscan.io/accounts/label/0x-protocol-ecosystem")
-	# time.sleep(20)
-	# print(web_driver.page_source)
+	web_driver = get_selenium_driver()
+	web_driver.get("https://etherscan.io/accounts/label/0x-protocol-ecosystem")
+	time.sleep(20)
+	print(web_driver.page_source)
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']

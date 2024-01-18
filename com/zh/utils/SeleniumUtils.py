@@ -27,6 +27,7 @@ def get_selenium_driver():
 	chrome_options.add_argument(f'Sec-Fetch-User={config.base_sec_fetch_user}')
 	chrome_options.add_argument(f'Sec-Fetch-Dest={config.base_sec_fetch_dest}')
 	chrome_options.add_argument(f'Upgrade-Insecure-Requests={config.base_upgrade_insecure_requests}')
+	chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
 
 	# 忽略 SSL 证书错误，允许访问使用无效证书的网站
 	chrome_options.add_argument('--ignore-certificate-errors')
