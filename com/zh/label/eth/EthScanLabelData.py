@@ -85,8 +85,9 @@ if __name__ == '__main__':
 	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
 
 	web_driver = get_selenium_driver()
-	web_driver.get("https://etherscan.io/accounts/label/0x-protocol-ecosystem")
-	time.sleep(20)
+	web_driver.get("https://etherscan.io/")
+	time.sleep(5)
+	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
 	print(web_driver.page_source)
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
