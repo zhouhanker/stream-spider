@@ -7,7 +7,7 @@ import re
 import csv
 import pandas as pd
 from lxml import html
-from com.zh.label.config import *
+from com.zh.label.config import config
 from com.zh.utils.FileUtils import get_user_agent
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -21,10 +21,10 @@ user_agent_path = '../../resource/agents.txt'
 
 # 获取ethscanCloud中的所有标签 只获取account标签和token标签
 def get_ethscan_all_label():
-	ethscan_cloud_url = f'{ethscan_label_base_url}{"/labelcloud"}'
+	ethscan_cloud_url = f'{config.ethscan_label_base_url}{"/labelcloud"}'
 	headers = {
 		'User-Agent': get_user_agent(user_agent_path),
-		'Accept': base_accept,
+		'Accept': config.base_accept,
 		'cookie': "etherscan_offset_datetime=+8; __stripe_mid=2284c985-abe9-47bc-a3dc-f6dd186fc50be372c7; etherscan_pwd=4792:Qdxb:ZQoxE7hwxuZ8IpB6V/Xg8t0SlBUyo6OYxvYH8fDRMes=; etherscan_userid=zhouhan; etherscan_autologin=True; __cflb=0H28vPcoRrcznZcNZSuFrvaNdHwh858XnsnowBrTHkg; _gid=GA1.2.310546296.1705468157; cf_clearance=PdguUBeWn1Sn1tw15OKm7ZbL0QJJZAHIgtyL7p2zxqU-1705470525-1-ATSdy4t/5ezAXkitP/R93VBYUbO3CxCKXqokYv6+LcDUBZPaWg0GBMwmJyrV76nq7ffaIObbRSRVeUNeL3hm8Wk=; cf_chl_rc_ni=7; cf_chl_3=be16dc3cc6971e3; ASP.NET_SessionId=u5w4xt52ozihhnocoohpqlwk; _ga_T1JC9RNQXV=GS1.1.1705482596.4.1.1705484391.59.0.0; _ga=GA1.2.1989122975.1705296681; _gat_gtag_UA_46998878_6=1"
 	}
 	eth_root_label_result_list = []
@@ -48,9 +48,9 @@ def get_ethscan_all_label():
 	for label in eth_root_label_result_list:
 		for url in label['url']:
 			if url.startswith('/accounts'):
-				label['account_url'] = f'{ethscan_label_base_url}{url}'
+				label['account_url'] = f'{config.ethscan_label_base_url}{url}'
 			if url.startswith('/tokens'):
-				label['token_url'] = f'{ethscan_label_base_url}{url}'
+				label['token_url'] = f'{config.ethscan_label_base_url}{url}'
 		del label['url']
 
 	return eth_root_label_result_list
@@ -80,14 +80,14 @@ def change_df_style(wait_df):
 
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
-	# ethscan_all_label = get_ethscan_all_label()
-	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
-	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	ethscan_all_label = get_ethscan_all_label()
+	print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
+	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
 
-	web_driver = get_selenium_driver(user_agent_path)
-	web_driver.get("https://etherscan.io/accounts/label/0x-protocol-ecosystem")
-	time.sleep(20)
-	print(web_driver.page_source)
+	# web_driver = get_selenium_driver()
+	# web_driver.get("https://etherscan.io/accounts/label/0x-protocol-ecosystem")
+	# time.sleep(20)
+	# print(web_driver.page_source)
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
