@@ -28,7 +28,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from com.zh.utils.SeleniumUtils import seleniumUtils
 
 user_agent_path = '../../resource/agents.txt'
-sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
+# explicitly changed encoding to utf-8
+os.system('chcp 65001')
 
 
 # 获取ethscanCloud中的所有标签 只获取account标签和token标签
@@ -126,14 +127,14 @@ if __name__ == '__main__':
 	# ethscan_all_label = get_ethscan_all_label()
 	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
 	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
-	get_label_diff_list(write_to_label_csv_path, './csvFile/2024-01-18-label')
+	# get_label_diff_list(write_to_label_csv_path, './csvFile/2024-01-18-label')
 
-	# web_driver = seleniumUtils.get_selenium_chrome_driver()
-	# web_driver.get("https://etherscan.io/labelcloud")
-	# time.sleep(5)
-	# web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
-	# time.sleep(10)
-	# print(web_driver.page_source)
+	web_driver = seleniumUtils.get_selenium_chrome_driver()
+	web_driver.get("https://etherscan.io/labelcloud")
+	time.sleep(5)
+	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
+	time.sleep(50)
+	print(web_driver.page_source)
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']

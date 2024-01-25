@@ -18,7 +18,6 @@ class config:
     base_sec_fetch_user: str = '?1'
     base_upgrade_insecure_requests: str = '1'
     base_sec_fetch_site: str = 'none'
-    cookie_str: str = 'cf_chl_3=a0b59cb37a18034; ASP.NET_SessionId=q4p2pxlkt041pos5sygj0aev; __cflb=0H28vPcoRrcznZcNZSuFrvaNdHwh857Fv6zRowoCAyz; etherscan_offset_datetime=+8; cf_clearance=eV7hacYddkDUdKxnIoTcbZWbzL1wPlriYwjR0LNB_iE-1705547802-1-ATsrtKqtzTqcCONWXx0dqyErC8sa5RTB71YBrJnTCyunbROcJK2Kc1uSu60eGmlwr/SKKkzi3sWKEAoky/ncNLs=; _gid=GA1.2.1638554359.1705547803; _gat_gtag_UA_46998878_6=1; __stripe_mid=e8742611-9a79-43a5-8f1e-bd62eb19e0b3c2e448; __stripe_sid=019e9b90-a8de-4374-8e0e-1bb540be6c21a12807; etherscan_pwd=4792:Qdxb:ZQoxE7hwxuZ8IpB6V/Xg8t0SlBUyo6OYxvYH8fDRMes=; etherscan_userid=zhouhan; etherscan_autologin=True; _ga_T1JC9RNQXV=GS1.1.1705547801.1.1.1705547823.38.0.0; _ga=GA1.2.36811765.1705547802'
     # 本地浏览器路径
     chrome_user_data_dir: str = rf"user-data-dir=C:\Users\{local_user_name}\AppData\Local\Google\Chrome\User Data"
     edge_user_data_dir: str = rf"user-data-dir=C:\Users\{local_user_name}\AppData\Local\Microsoft\Edge\User Data"
