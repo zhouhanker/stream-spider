@@ -8,10 +8,11 @@ class config:
     base_accept_encoding: str = 'gzip, deflate, br'
     base_user_agent: str = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     base_cache_control: str = 'max-age=0'
-    base_accept_language: str = 'zh-CN,zh;q=0.9'
+    base_accept_language: str = 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
     base_sec_ch_ua: str = 'Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120'
     base_sec_ch_Ua_mobile: str = "?0"
     base_sec_ch_ua_platform: str = 'Windows'
+    base_Sec_Ch_Ua_Arc: str = 'x86'
     base_sec_fetch_dest: str = 'document'
     base_sec_fetch_mode: str = 'navigate'
     base_sec_fetch_user: str = '?1'

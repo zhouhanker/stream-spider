@@ -16,7 +16,7 @@ class seleniumUtils:
 		# chrome_options.add_argument('--headless')
 		# 关闭自动化测试显示
 		chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
-
+		chrome_options.add_argument('--disable-blink-features=AutomationControlled')
 		chrome_options.add_argument(f'user-agent={config.base_user_agent}')
 		chrome_options.add_argument('window-size=1920x3000')
 		chrome_options.add_argument(f'Accept={config.base_accept}')
@@ -30,6 +30,7 @@ class seleniumUtils:
 		chrome_options.add_argument(f'Sec-Fetch-Mode={config.base_sec_fetch_mode}')
 		chrome_options.add_argument(f'Sec-Fetch-User={config.base_sec_fetch_user}')
 		chrome_options.add_argument(f'Sec-Fetch-Dest={config.base_sec_fetch_dest}')
+		chrome_options.add_argument(f'Sec-Ch-Ua-Arch={config.base_Sec_Ch_Ua_Arc}')
 		chrome_options.add_argument(f'Upgrade-Insecure-Requests={config.base_upgrade_insecure_requests}')
 
 		# 忽略 SSL 证书错误，允许访问使用无效证书的网站
@@ -61,6 +62,7 @@ class seleniumUtils:
 		edge_options.add_argument(f'Sec-Fetch-Mode={config.base_sec_fetch_mode}')
 		edge_options.add_argument(f'Sec-Fetch-User={config.base_sec_fetch_user}')
 		edge_options.add_argument(f'Sec-Fetch-Dest={config.base_sec_fetch_dest}')
+		edge_options.add_argument(f'Sec-Ch-Ua-Arch={config.base_Sec_Ch_Ua_Arc}')
 		edge_options.add_argument(f'Upgrade-Insecure-Requests={config.base_upgrade_insecure_requests}')
 
 		# 忽略 SSL 证书错误，允许访问使用无效证书的网站

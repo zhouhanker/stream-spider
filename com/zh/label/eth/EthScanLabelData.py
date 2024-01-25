@@ -1,15 +1,26 @@
 import os.path
 import time
 import timeit
+from telnetlib import EC
+import sys
+import cloudscraper
+import undetected_chromedriver as uc
 import requests
 import logging
 import re
 import csv
 import pandas as pd
+from colorama import Fore
 from lxml import html
+from pyspark.python.pyspark.shell import sc
+from selenium_stealth import stealth
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+
 from com.zh.label.config import config
 from com.zh.utils.FileUtils import get_user_agent
 from datetime import datetime
+from pyspark.sql import session, SparkSession
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -17,6 +28,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from com.zh.utils.SeleniumUtils import seleniumUtils
 
 user_agent_path = '../../resource/agents.txt'
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
 
 
 # 获取ethscanCloud中的所有标签 只获取account标签和token标签
@@ -78,18 +90,50 @@ def change_df_style(wait_df):
 	return df_to_string
 
 
+def get_label_diff_list(current_file_path, old_file_path):
+	spark = SparkSession.builder.config("spark.driver.extraJavaOptions", "-Dfile.encoding=UTF-8").appName("readCsv").getOrCreate()
+	sc.setLogLevel("WARN")
+
+	spark.read.csv(current_file_path, header=True, inferSchema=True).createOrReplaceTempView("current_label")
+	spark.read.csv(old_file_path, header=True, inferSchema=True).createOrReplaceTempView("old_label")
+	result_label = spark.sql("""
+			select t1.label_name,
+				   t1.current_cnt,
+				   t1.old_cnt,
+				   (t1.current_cnt - t1.old_cnt) as cnt_diff,
+				   t1.account_url,
+				   t1.token_url
+			from (
+				select current_label.label_name,
+					   current_label.cnt as current_cnt,
+					   old_label.cnt as old_cnt,
+					   current_label.is_read,
+					   current_label.account_url,
+					   current_label.token_url	
+			from current_label
+			left join old_label on current_label.label_name = old_label.label_name
+			where current_label.cnt > old_label.cnt
+			) as t1
+			where t1.account_url is not null and t1.token_url is not null 
+		""")
+	result_label.coalesce(1).toPandas().to_csv(f'./csvFile/{get_time()}-diff-label.csv', mode='w', header=result_label.columns, index=False)
+	spark.stop()
+	print(Fore.RED + 'Get_label_diff_list() method execute complete', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
+
+
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
 	# ethscan_all_label = get_ethscan_all_label()
 	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
 	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	get_label_diff_list(write_to_label_csv_path, './csvFile/2024-01-18-label')
 
-	web_driver = seleniumUtils.get_selenium_chrome_driver()
-	web_driver.get("https://etherscan.io/")
-	time.sleep(5)
-	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
-	time.sleep(5)
-	print(web_driver.page_source)
+	# web_driver = seleniumUtils.get_selenium_chrome_driver()
+	# web_driver.get("https://etherscan.io/labelcloud")
+	# time.sleep(5)
+	# web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
+	# time.sleep(10)
+	# print(web_driver.page_source)
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
