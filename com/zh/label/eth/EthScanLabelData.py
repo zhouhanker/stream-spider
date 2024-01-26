@@ -91,6 +91,37 @@ def change_df_style(wait_df):
 	return df_to_string
 
 
+def get_address_label_detail(current_file_path):
+	current_df = pd.read_csv(current_file_path)
+	select_column = ['label_name', 'account_url', 'token_url']
+	account_df = current_df[select_column].dropna(subset=['account_url'])
+	web_driver = seleniumUtils.get_selenium_chrome_driver()
+	web_driver.get("https://etherscan.io/labelcloud")
+	time.sleep(5)
+	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
+	input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
+	for i in account_df.index:
+		label_name = account_df.loc[i, 'label_name']
+		account_url = account_df.loc[i, 'account_url']
+		print(account_url)
+		web_driver.get(account_url)
+		time.sleep(4)
+		source_doc = html.fromstring(web_driver.page_source)
+		tr_elements = source_doc.xpath("//tbody/tr")
+		for tr in tr_elements:
+			address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
+			name_tag = tr.xpath(".//td[2]/text()")[0]
+			data = {
+				'label_name': label_name,
+				'address_type': "address",
+				'address': address,
+				'name_tag': name_tag,
+				'chain_code': 'ETH'
+			}
+
+			print(data)
+
+
 def get_label_diff_list(current_file_path, old_file_path):
 	spark = SparkSession.builder.config("spark.driver.extraJavaOptions", "-Dfile.encoding=UTF-8").appName("readCsv").getOrCreate()
 	sc.setLogLevel("WARN")
@@ -129,12 +160,23 @@ if __name__ == '__main__':
 	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
 	# get_label_diff_list(write_to_label_csv_path, './csvFile/2024-01-18-label')
 
-	web_driver = seleniumUtils.get_selenium_chrome_driver()
-	web_driver.get("https://etherscan.io/labelcloud")
-	time.sleep(5)
-	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
-	time.sleep(50)
-	print(web_driver.page_source)
+	# web_driver = seleniumUtils.get_selenium_chrome_driver()
+	# web_driver.get("https://etherscan.io/labelcloud")
+	# time.sleep(5)
+	# web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
+	# time.sleep(50)
+	# source_doc = html.fromstring(web_driver.page_source)
+	# tr_elements = source_doc.xpath("//tbody/tr")
+	# for tr in tr_elements:
+	# 	address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
+	# 	label_name = tr.xpath(".//td[2]/text()")[0]
+	# 	data = {
+	# 		'address': address,
+	# 		'label_name': label_name
+	# 	}
+	# 	print(data)
+
+	get_address_label_detail('./csvFile/2024-01-25-label')
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
@@ -148,5 +190,3 @@ if __name__ == '__main__':
 	# 	time.sleep(0.5 + random.random())
 	# 	web_driver.get(account_url)
 	# 	time.sleep(3)
-
-

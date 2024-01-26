@@ -1,15 +1,9 @@
 import requests
+import pandas as pd
+from colorama import Fore
 
-url = "http://192.168.213.138:8191/v1"
-headers = {"Content-Type": "application/json"}
-data = {
-	"cmd": "request.get",
-	"url": "https://www.baidu.com",
-	"maxTimeout": 1000
-}
-response = requests.post(url, headers=headers, json=data)
-print(response)
-print(response.text)
+input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
+print("ok")
 
 
 
