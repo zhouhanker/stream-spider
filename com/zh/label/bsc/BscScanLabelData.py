@@ -87,8 +87,11 @@ def get_address_label_detail(current_file_path):
 	web_driver = seleniumUtils.get_selenium_chrome_driver()
 	web_driver.get("https://bscscan.com/labelcloud")
 	time.sleep(5)
-	web_driver.get('https://bscscan.com/accounts/label/0x-protocol')
+	web_driver.get('https://bscscan.com/accounts/label/bzx')
 	input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
+	time.sleep(1)
+	web_driver.get("https://bscscan.com/accounts/label/charity")
+	input("1")
 	for i in account_df.index:
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
