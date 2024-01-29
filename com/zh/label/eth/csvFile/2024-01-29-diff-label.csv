@@ -1,0 +1,20 @@
+label_name,current_cnt,old_cnt,cnt_diff,account_url,token_url
+Beacon Depositor,152330,150484,1846,https://etherscan.io/accounts/label/beacon-depositor,https://etherscan.io/tokens/label/beacon-depositor
+Bridged Token,1786,1762,24,https://etherscan.io/accounts/label/bridged-token,https://etherscan.io/tokens/label/bridged-token
+Communication,15,14,1,https://etherscan.io/accounts/label/communication,https://etherscan.io/tokens/label/communication
+DeFi,2189,2183,6,https://etherscan.io/accounts/label/defi,https://etherscan.io/tokens/label/defi
+Gambling,167,164,3,https://etherscan.io/accounts/label/gambling,https://etherscan.io/tokens/label/gambling
+Gaming,712,709,3,https://etherscan.io/accounts/label/gaming,https://etherscan.io/tokens/label/gaming
+Insurance,53,52,1,https://etherscan.io/accounts/label/insurance,https://etherscan.io/tokens/label/insurance
+Liquid,12,11,1,https://etherscan.io/accounts/label/liquid,https://etherscan.io/tokens/label/liquid
+Marketing,38,37,1,https://etherscan.io/accounts/label/marketing,https://etherscan.io/tokens/label/marketing
+Network,58,57,1,https://etherscan.io/accounts/label/network,https://etherscan.io/tokens/label/network
+Old Contract,1936,1932,4,https://etherscan.io/accounts/label/old-contract,https://etherscan.io/tokens/label/old-contract
+Services / Solutions,103,102,1,https://etherscan.io/accounts/label/services-solutions,https://etherscan.io/tokens/label/services-solutions
+Social Networking,90,89,1,https://etherscan.io/accounts/label/social-networking,https://etherscan.io/tokens/label/social-networking
+Stablecoin,256,254,2,https://etherscan.io/accounts/label/stablecoin,https://etherscan.io/tokens/label/stablecoin
+Staking,673,672,1,https://etherscan.io/accounts/label/staking,https://etherscan.io/tokens/label/staking
+SushiSwap,3922,3916,6,https://etherscan.io/accounts/label/sushiswap,https://etherscan.io/tokens/label/sushiswap
+Trading,252,251,1,https://etherscan.io/accounts/label/trading,https://etherscan.io/tokens/label/trading
+Uniswap,309504,307271,2233,https://etherscan.io/accounts/label/uniswap,https://etherscan.io/tokens/label/uniswap
+Website Down,924,923,1,https://etherscan.io/accounts/label/website-down,https://etherscan.io/tokens/label/website-down

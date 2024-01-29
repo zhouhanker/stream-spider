@@ -1,7 +1,0 @@
-label_name,cnt,is_read,account_url,token_url
-0x Protocol,59,0,https://etherscan.io/accounts/label/0x-protocol,https://etherscan.io/tokens/label/0x-protocol
-0x Protocol Ecosystem,23,0,https://etherscan.io/accounts/label/0x-protocol-ecosystem,https://etherscan.io/tokens/label/0x-protocol-ecosystem
-0xSplits,3,0,https://etherscan.io/accounts/label/0xsplits,
-0xUniverse,7,0,https://etherscan.io/accounts/label/0xuniverse,https://etherscan.io/tokens/label/0xuniverse
-1inch,40,0,https://etherscan.io/accounts/label/1inch,https://etherscan.io/tokens/label/1inch
-3D Printing,1,0,,https://etherscan.io/tokens/label/3d-printing

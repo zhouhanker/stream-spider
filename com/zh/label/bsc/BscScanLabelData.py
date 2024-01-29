@@ -1,5 +1,7 @@
 import os.path
 import time
+import timeit
+
 import requests
 import re
 import csv
@@ -20,12 +22,11 @@ os.system('chcp 65001')
 
 
 # 获取ethscanCloud中的所有标签 只获取account标签和token标签
-def get_ethscan_all_label():
+def get_bsc_scan_all_label():
 	ethscan_cloud_url = f'{config.ethscan_label_base_url}{"/labelcloud"}'
 	headers = {
 		'User-Agent': get_user_agent(user_agent_path),
-		'Accept': config.base_accept,
-		'cookie': "etherscan_offset_datetime=+8; __stripe_mid=2284c985-abe9-47bc-a3dc-f6dd186fc50be372c7; etherscan_pwd=4792:Qdxb:ZQoxE7hwxuZ8IpB6V/Xg8t0SlBUyo6OYxvYH8fDRMes=; etherscan_userid=zhouhan; etherscan_autologin=True; __cflb=0H28vPcoRrcznZcNZSuFrvaNdHwh858XnsnowBrTHkg; _gid=GA1.2.310546296.1705468157; cf_clearance=PdguUBeWn1Sn1tw15OKm7ZbL0QJJZAHIgtyL7p2zxqU-1705470525-1-ATSdy4t/5ezAXkitP/R93VBYUbO3CxCKXqokYv6+LcDUBZPaWg0GBMwmJyrV76nq7ffaIObbRSRVeUNeL3hm8Wk=; cf_chl_rc_ni=7; cf_chl_3=be16dc3cc6971e3; ASP.NET_SessionId=u5w4xt52ozihhnocoohpqlwk; _ga_T1JC9RNQXV=GS1.1.1705482596.4.1.1705484391.59.0.0; _ga=GA1.2.1989122975.1705296681; _gat_gtag_UA_46998878_6=1"
+		'Accept': config.base_accept
 	}
 	eth_root_label_result_list = []
 	label_resp = requests.get(ethscan_cloud_url, headers=headers).text
@@ -83,9 +84,9 @@ def get_address_label_detail(current_file_path):
 	select_column = ['label_name', 'account_url', 'token_url']
 	account_df = current_df[select_column].dropna(subset=['account_url'])
 	web_driver = seleniumUtils.get_selenium_chrome_driver()
-	web_driver.get("https://etherscan.io/labelcloud")
+	web_driver.get("https://bscscan.com/labelcloud")
 	time.sleep(5)
-	web_driver.get('https://etherscan.io/accounts/label/0x-protocol-ecosystem')
+	web_driver.get('https://bscscan.com/accounts/label/0x-protocol')
 	input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
 	for i in account_df.index:
 		label_name = account_df.loc[i, 'label_name']
@@ -103,7 +104,7 @@ def get_address_label_detail(current_file_path):
 				'address_type': "address",
 				'address': address,
 				'name_tag': name_tag,
-				'chain_code': 'ETH'
+				'chain_code': 'BSC'
 			}
 
 			print(data)
@@ -115,7 +116,7 @@ def get_label_diff_list(current_file_path, old_file_path):
 
 	spark.read.csv(current_file_path, header=True, inferSchema=True).createOrReplaceTempView("current_label")
 	spark.read.csv(old_file_path, header=True, inferSchema=True).createOrReplaceTempView("old_label")
-	result_label = spark.sql("""
+	result_label = spark.sql("""-- noinspection SqlResolveForFile
 			select t1.label_name,
 				   t1.current_cnt,
 				   t1.old_cnt,
@@ -142,10 +143,10 @@ def get_label_diff_list(current_file_path, old_file_path):
 
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
-	# ethscan_all_label = get_ethscan_all_label()
-	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
-	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
-	get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
+	ethscan_all_label = get_bsc_scan_all_label()
+	print(f'GET Ethscan.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
+	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
 
 	get_address_label_detail('./csvFile/2024-01-29-label')
 
