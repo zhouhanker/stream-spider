@@ -1,4 +1,5 @@
 import os.path
+import random
 import time
 import timeit
 
@@ -92,6 +93,7 @@ def get_address_label_detail(current_file_path):
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
 		print(account_url)
+		time.sleep(0.5 + random.random())
 		web_driver.get(account_url)
 		time.sleep(4)
 		source_doc = html.fromstring(web_driver.page_source)
