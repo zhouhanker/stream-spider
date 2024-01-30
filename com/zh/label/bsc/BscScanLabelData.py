@@ -115,10 +115,10 @@ def get_address_label_detail(current_file_path):
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
 		account_cnt = account_df.loc[i, 'account_cnt']
-		if account_cnt <= 10:
+		if account_cnt <= 99:
 			print(account_url)
 			time.sleep(0.5 + random.random())
-			web_driver.get(account_url)
+			web_driver.get(account_url+ f'?subcatid=undefined&size=100&start={0}&col=1&order=asc')
 			time.sleep(3 + random.random())
 			source_doc = html.fromstring(web_driver.page_source)
 			tr_elements = source_doc.xpath("//tbody/tr")
@@ -206,12 +206,29 @@ if __name__ == '__main__':
 	# print(f'GET BscScanCloud.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
 	# write_label_to_csv(bscscan_all_label, write_to_label_csv_path)
 	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
-	get_address_label_detail('./csvFile/2024-01-30-label.csv')
+	
+	# get_address_label_detail('./csvFile/2024-01-30-label.csv')
 	
 	current_df = pd.read_csv('./csvFile/2024-01-30-label.csv')
 	select_column = ['label_name', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
 	token_df = current_df[select_column].dropna(subset=['token_url'])
+	web_driver = seleniumUtils.get_selenium_chrome_driver()
+	web_driver.get("https://bscscan.com/labelcloud")
+	time.sleep(5)
 	for i in token_df.index:
 		label_name = token_df.loc[i, 'label_name']
 		token_url = token_df.loc[i, 'token_url']
 		token_cnt = token_df.loc[i, 'token_cnt']
+		if token_cnt <= 99:
+			time.sleep(0.5 + random.random())
+			parse_url = token_url + f'?subcatid=0&size=100&start={0}&col=3&order=desc'
+			web_driver.get(parse_url)
+			print(parse_url)
+			time.sleep(3 + random.random())
+			source_doc = html.fromstring(web_driver.page_source)
+			tr_elements = source_doc.xpath("//tbody/tr")
+			for tr in tr_elements:
+				address = tr.xpath(".//td/a/@href")
+				name_tag = tr.xpath(".//td/a/div/span/text()")
+				print(address, " ----> ", name_tag)
+			
