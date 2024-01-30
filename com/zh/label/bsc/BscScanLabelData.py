@@ -1,3 +1,4 @@
+import math
 import os.path
 import random
 import time
@@ -48,7 +49,7 @@ def get_bsc_scan_all_label():
 			'is_read': 0
 		}
 		bsc_root_label_result_list.append(data)
-
+	
 	for label in bsc_root_label_result_list:
 		for url in label['url']:
 			if url.startswith('/accounts'):
@@ -56,7 +57,7 @@ def get_bsc_scan_all_label():
 			if url.startswith('/tokens'):
 				label['token_url'] = f'{config.bscscan_label_base_url}{url}'
 		del label['url']
-		
+	
 	for label in bsc_root_label_result_list:
 		for j in label['detail_cnt']:
 			if j.startswith('Accounts'):
@@ -74,13 +75,23 @@ def get_time():
 def write_label_to_csv(label_list, label_path):
 	if not os.path.exists(label_path):
 		with open(label_path, mode='w', newline='') as f:
-			column_name = ['label_name', 'cnt', 'is_read', 'account_url', 'token_url']
+			column_name = ['label_name', 'cnt', 'is_read', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
 			writer = csv.DictWriter(f, fieldnames=column_name)
 			writer.writeheader()
 			[writer.writerow(row) for row in label_list]
 		print(f'label list write to csv -> {label_path}')
 	else:
 		print(f'{label_path}{"is exists !"}')
+
+
+def write_dict_2_csv(dict_list, csv_path):
+	os_path_exists = os.path.exists(csv_path)
+	filed_name = dict_list.keys()
+	with open(csv_path, 'a', newline='', encoding='utf-8') as csv_file:
+		writer = csv.DictWriter(csv_file, fieldnames=filed_name)
+		if not os_path_exists:
+			writer.writeheader()
+		writer.writerow(dict_list)
 
 
 def change_df_style(wait_df):
@@ -91,41 +102,75 @@ def change_df_style(wait_df):
 
 def get_address_label_detail(current_file_path):
 	current_df = pd.read_csv(current_file_path)
-	select_column = ['label_name', 'account_url', 'token_url']
+	select_column = ['label_name', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
 	account_df = current_df[select_column].dropna(subset=['account_url'])
 	web_driver = seleniumUtils.get_selenium_chrome_driver()
 	web_driver.get("https://bscscan.com/labelcloud")
 	time.sleep(5)
 	web_driver.get('https://bscscan.com/accounts/label/bzx')
-	input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
+	input(Fore.LIGHTRED_EX + "Have you entered the first page? Please enter any character: \n" + Fore.RESET)
 	time.sleep(1)
+	# account 类型
 	for i in account_df.index:
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
-		print(account_url)
-		time.sleep(0.5 + random.random())
-		web_driver.get(account_url)
-		time.sleep(5)
-		source_doc = html.fromstring(web_driver.page_source)
-		tr_elements = source_doc.xpath("//tbody/tr")
-		for tr in tr_elements:
-			address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
-			name_tag = tr.xpath(".//td[2]")[0].text_content()
-			data = {
-				'label_name': label_name,
-				'address_type': "address",
-				'address': address,
-				'name_tag': name_tag,
-				'chain_code': 'BSC'
-			}
-
-			print(data)
+		account_cnt = account_df.loc[i, 'account_cnt']
+		if account_cnt <= 10:
+			print(account_url)
+			time.sleep(0.5 + random.random())
+			web_driver.get(account_url)
+			time.sleep(3 + random.random())
+			source_doc = html.fromstring(web_driver.page_source)
+			tr_elements = source_doc.xpath("//tbody/tr")
+			for tr in tr_elements:
+				address = ''
+				name_tag = ''
+				if tr.xpath(".//td[1]/span/span/a/@href"):
+					address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
+				if tr.xpath(".//td[2]"):
+					name_tag = tr.xpath(".//td[2]")[0].text_content()
+				data = {
+					'label_name': label_name,
+					'address_type': "address",
+					'address': address,
+					'name_tag': name_tag,
+					'chain_code': 'BSC'
+				}
+				print(data)
+				write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
+		if account_cnt > 99:
+			page_cnt = math.ceil(account_cnt / 100)
+			limit = 100
+			for page in range(1, page_cnt + 1):
+				time.sleep(0.4 + random.random())
+				web_driver.get(account_url + f'?subcatid=undefined&size=100&start={limit}&col=1&order=asc')
+				time.sleep(3 + random.random())
+				source_doc = html.fromstring(web_driver.page_source)
+				tr_elements = source_doc.xpath("//tbody/tr")
+				for tr in tr_elements:
+					address = ''
+					name_tag = ''
+					if tr.xpath(".//td[1]/span/span/a/@href"):
+						address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
+					if tr.xpath(".//td[2]"):
+						name_tag = tr.xpath(".//td[2]")[0].text_content()
+					data = {
+						'label_name': label_name,
+						'address_type': "address",
+						'address': address,
+						'name_tag': name_tag,
+						'chain_code': 'BSC'
+					}
+					print(data)
+					write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
+				limit += 100
 
 
 def get_label_diff_list(current_file_path, old_file_path):
-	spark = SparkSession.builder.config("spark.driver.extraJavaOptions", "-Dfile.encoding=UTF-8").appName("readCsv").getOrCreate()
+	spark = SparkSession.builder.config("spark.driver.extraJavaOptions", "-Dfile.encoding=UTF-8").appName(
+		"readCsv").getOrCreate()
 	sc.setLogLevel("WARN")
-
+	
 	spark.read.csv(current_file_path, header=True, inferSchema=True).createOrReplaceTempView("current_label")
 	spark.read.csv(old_file_path, header=True, inferSchema=True).createOrReplaceTempView("old_label")
 	result_label = spark.sql("""-- noinspection SqlResolveForFile
@@ -148,32 +193,25 @@ def get_label_diff_list(current_file_path, old_file_path):
 			) as t1
 			where t1.account_url is not null and t1.token_url is not null 
 		""")
-	result_label.coalesce(1).toPandas().to_csv(f'./csvFile/{get_time()}-diff-label.csv', mode='w', header=result_label.columns, index=False)
+	result_label.coalesce(1).toPandas().to_csv(f'./csvFile/{get_time()}-diff-label.csv', mode='w',
+											   header=result_label.columns, index=False)
 	spark.stop()
-	print(Fore.RED + 'Get_label_diff_list() method execute complete', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
+	print(Fore.RED + 'Get_label_diff_list() method execute complete',
+		  time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
 
 
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
-	bscscan_all_label = get_bsc_scan_all_label()
-	for i in bscscan_all_label:
-		print(i)
+	# bscscan_all_label = get_bsc_scan_all_label()
 	# print(f'GET BscScanCloud.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
 	# write_label_to_csv(bscscan_all_label, write_to_label_csv_path)
 	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
-
-	# get_address_label_detail('./csvFile/2024-01-30-label.csv')
-
-
-	# read_csv_df = pd.read_csv(write_to_label_csv_path)
-	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
-	# account_df = read_csv_df[select_column].dropna(subset=['account_url'])
-	# for i in account_df.index:
-	# 	labelName = account_df.loc[i, 'label_name']
-	# 	cnt = account_df.loc[i, 'cnt']
-	# 	is_read = account_df.loc[i, 'is_read']
-	# 	account_url = account_df.loc[i, 'account_url']
-	# 	print(i, labelName, cnt, is_read, account_url)
-	# 	time.sleep(0.5 + random.random())
-	# 	web_driver.get(account_url)
-	# 	time.sleep(3)
+	get_address_label_detail('./csvFile/2024-01-30-label.csv')
+	
+	current_df = pd.read_csv('./csvFile/2024-01-30-label.csv')
+	select_column = ['label_name', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
+	token_df = current_df[select_column].dropna(subset=['token_url'])
+	for i in token_df.index:
+		label_name = token_df.loc[i, 'label_name']
+		token_url = token_df.loc[i, 'token_url']
+		token_cnt = token_df.loc[i, 'token_cnt']
