@@ -3,6 +3,7 @@ class config:
     local_user_name: str = 'han.zhou'
     # 初始url
     ethscan_label_base_url: str = 'https://etherscan.io'
+    bscscan_label_base_url: str = 'https://bscscan.com'
     # Accept 头信息
     base_accept: str = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
     base_accept_encoding: str = 'gzip, deflate, br'

@@ -22,40 +22,49 @@ user_agent_path = '../../resource/agents.txt'
 os.system('chcp 65001')
 
 
-# 获取ethscanCloud中的所有标签 只获取account标签和token标签
+# 获取bscScanCloud中的所有标签 只获取account标签和token标签
 def get_bsc_scan_all_label():
-	ethscan_cloud_url = f'{config.ethscan_label_base_url}{"/labelcloud"}'
+	bscscan_cloud_url = f'{config.bscscan_label_base_url}{"/labelcloud"}'
 	headers = {
 		'User-Agent': get_user_agent(user_agent_path),
 		'Accept': config.base_accept
 	}
-	eth_root_label_result_list = []
-	label_resp = requests.get(ethscan_cloud_url, headers=headers).text
-	eth_root = html.fromstring(label_resp)
-	select_div = eth_root.xpath("//div[@class='col-md-4 col-lg-3 mb-3 secondary-container']")
+	bsc_root_label_result_list = []
+	label_resp = requests.get(bscscan_cloud_url, headers=headers).text
+	bsc_root = html.fromstring(label_resp)
+	select_div = bsc_root.xpath("//div[@class='col-md-4 col-lg-3 mb-3 secondary-container']")
 	for div in select_div:
 		origin_name = div.xpath(".//span")[0].text_content().strip()
 		cnt = origin_name.split(' ')[-1]
 		label_name = re.sub(r'\s*\d+$', '', origin_name)
 		# 获取li里面a标签的href值
 		href_values = div.xpath(".//li/a/@href")
+		detail_cnt = div.xpath(".//ul/li/a/text()")
 		data = {
 			'label_name': label_name,
 			'url': href_values,
 			'cnt': cnt,
+			'detail_cnt': detail_cnt,
 			'is_read': 0
 		}
-		eth_root_label_result_list.append(data)
+		bsc_root_label_result_list.append(data)
 
-	for label in eth_root_label_result_list:
+	for label in bsc_root_label_result_list:
 		for url in label['url']:
 			if url.startswith('/accounts'):
-				label['account_url'] = f'{config.ethscan_label_base_url}{url}'
+				label['account_url'] = f'{config.bscscan_label_base_url}{url}'
 			if url.startswith('/tokens'):
-				label['token_url'] = f'{config.ethscan_label_base_url}{url}'
+				label['token_url'] = f'{config.bscscan_label_base_url}{url}'
 		del label['url']
-
-	return eth_root_label_result_list
+		
+	for label in bsc_root_label_result_list:
+		for j in label['detail_cnt']:
+			if j.startswith('Accounts'):
+				label['account_cnt'] = j.split(' ')[-1].strip('()')
+			if j.startswith('Tokens'):
+				label['token_cnt'] = j.split(' ')[-1].strip('()')
+		del label['detail_cnt']
+	return bsc_root_label_result_list
 
 
 def get_time():
@@ -65,7 +74,7 @@ def get_time():
 def write_label_to_csv(label_list, label_path):
 	if not os.path.exists(label_path):
 		with open(label_path, mode='w', newline='') as f:
-			column_name = label_list[0].keys()
+			column_name = ['label_name', 'cnt', 'is_read', 'account_url', 'token_url']
 			writer = csv.DictWriter(f, fieldnames=column_name)
 			writer.writeheader()
 			[writer.writerow(row) for row in label_list]
@@ -90,20 +99,18 @@ def get_address_label_detail(current_file_path):
 	web_driver.get('https://bscscan.com/accounts/label/bzx')
 	input(Fore.LIGHTRED_EX+"Have you entered the first page? Please enter any character: \n"+Fore.RESET)
 	time.sleep(1)
-	web_driver.get("https://bscscan.com/accounts/label/charity")
-	input("1")
 	for i in account_df.index:
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
 		print(account_url)
 		time.sleep(0.5 + random.random())
 		web_driver.get(account_url)
-		time.sleep(4)
+		time.sleep(5)
 		source_doc = html.fromstring(web_driver.page_source)
 		tr_elements = source_doc.xpath("//tbody/tr")
 		for tr in tr_elements:
 			address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
-			name_tag = tr.xpath(".//td[2]/text()")[0]
+			name_tag = tr.xpath(".//td[2]")[0].text_content()
 			data = {
 				'label_name': label_name,
 				'address_type': "address",
@@ -147,13 +154,16 @@ def get_label_diff_list(current_file_path, old_file_path):
 
 
 if __name__ == '__main__':
-	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
-	ethscan_all_label = get_bsc_scan_all_label()
-	print(f'GET Ethscan.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
-	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
+	bscscan_all_label = get_bsc_scan_all_label()
+	for i in bscscan_all_label:
+		print(i)
+	# print(f'GET BscScanCloud.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
+	# write_label_to_csv(bscscan_all_label, write_to_label_csv_path)
 	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
 
-	get_address_label_detail('./csvFile/2024-01-29-label')
+	# get_address_label_detail('./csvFile/2024-01-30-label.csv')
+
 
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
