@@ -115,9 +115,8 @@ def get_address_label_detail(current_file_path):
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
 		account_cnt = account_df.loc[i, 'account_cnt']
-		print("---------> "+account_url)
 		if account_cnt <= 50:
-			print(account_url)
+			print("---50acc----> "+account_url)
 			time.sleep(0.5 + random.random())
 			web_driver.get(account_url + f'?subcatid=undefined&size=50&start={0}&col=1&order=asc')
 			time.sleep(3 + random.random())
@@ -144,28 +143,32 @@ def get_address_label_detail(current_file_path):
 			limit = 100
 			for page in range(1, page_cnt + 1):
 				time.sleep(0.4 + random.random())
-				web_driver.get(account_url + f'?subcatid=undefined&size=100&start={limit}&col=1&order=asc')
+				print("---大于acc50----> " + account_url)
+				parse_url = account_url + f'?subcatid=undefined&size=100&start={limit}&col=1&order=asc'
+				web_driver.get(parse_url)
+				print(parse_url)
 				time.sleep(3 + random.random())
 				source_doc = html.fromstring(web_driver.page_source)
 				tr_elements = source_doc.xpath("//tbody/tr")
-				for tr in tr_elements:
-					address = ''
-					name_tag = ''
-					if tr.xpath(".//td[1]/span/span/a/@href"):
-						address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
-					if tr.xpath(".//td[2]"):
-						name_tag = tr.xpath(".//td[2]")[0].text_content()
-					data = {
-						'label_name': label_name,
-						'address': address,
-						'address_type': "address",
-						'name_tag': name_tag,
-						'chain_code': 'BSC'
-					}
-					print(data)
-					write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
-				limit += 100
-				
+				if tr_elements is not None:
+					for tr in tr_elements:
+						address = ''
+						name_tag = ''
+						if tr.xpath(".//td[1]/span/span/a/@href"):
+							address = tr.xpath(".//td[1]/span/span/a/@href")[0].split('/')[2]
+						if tr.xpath(".//td[2]"):
+							name_tag = tr.xpath(".//td[2]")[0].text_content()
+						data = {
+							'label_name': label_name,
+							'address': address,
+							'address_type': "address",
+							'name_tag': name_tag,
+							'chain_code': 'BSC'
+						}
+						print(data)
+						write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
+					limit += 100
+					
 	# token 类型
 	token_df = current_df[select_column].dropna(subset=['token_url'])
 	for i in token_df.index:
