@@ -79,7 +79,7 @@ def write_label_to_csv(label_list, label_path):
 			writer = csv.DictWriter(f, fieldnames=column_name)
 			writer.writeheader()
 			[writer.writerow(row) for row in label_list]
-		print(f'label list write to csv -> {label_path}')
+		print(Fore.RED+f'label list write to csv -> {label_path}'+Fore.RESET)
 	else:
 		print(f'{label_path}{"is exists !"}')
 
@@ -109,16 +109,17 @@ def get_address_label_detail(current_file_path):
 	time.sleep(5)
 	web_driver.get('https://bscscan.com/accounts/label/bzx')
 	input(Fore.LIGHTRED_EX + "Have you entered the first page? Please enter any character: \n" + Fore.RESET)
-	time.sleep(1)
+	time.sleep(2)
 	# account 类型
 	for i in account_df.index:
 		label_name = account_df.loc[i, 'label_name']
 		account_url = account_df.loc[i, 'account_url']
 		account_cnt = account_df.loc[i, 'account_cnt']
-		if account_cnt <= 99:
+		print("---------> "+account_url)
+		if account_cnt <= 50:
 			print(account_url)
 			time.sleep(0.5 + random.random())
-			web_driver.get(account_url+ f'?subcatid=undefined&size=100&start={0}&col=1&order=asc')
+			web_driver.get(account_url + f'?subcatid=undefined&size=50&start={0}&col=1&order=asc')
 			time.sleep(3 + random.random())
 			source_doc = html.fromstring(web_driver.page_source)
 			tr_elements = source_doc.xpath("//tbody/tr")
@@ -131,14 +132,14 @@ def get_address_label_detail(current_file_path):
 					name_tag = tr.xpath(".//td[2]")[0].text_content()
 				data = {
 					'label_name': label_name,
-					'address_type': "address",
 					'address': address,
+					'address_type': "address",
 					'name_tag': name_tag,
 					'chain_code': 'BSC'
 				}
 				print(data)
 				write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
-		if account_cnt > 99:
+		if account_cnt > 50:
 			page_cnt = math.ceil(account_cnt / 100)
 			limit = 100
 			for page in range(1, page_cnt + 1):
@@ -156,14 +157,75 @@ def get_address_label_detail(current_file_path):
 						name_tag = tr.xpath(".//td[2]")[0].text_content()
 					data = {
 						'label_name': label_name,
-						'address_type': "address",
 						'address': address,
+						'address_type': "address",
 						'name_tag': name_tag,
 						'chain_code': 'BSC'
 					}
 					print(data)
 					write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
 				limit += 100
+				
+	# token 类型
+	token_df = current_df[select_column].dropna(subset=['token_url'])
+	for i in token_df.index:
+		label_name = token_df.loc[i, 'label_name']
+		token_url = token_df.loc[i, 'token_url']
+		token_cnt = token_df.loc[i, 'token_cnt']
+		
+		if token_cnt <= 50:
+			time.sleep(0.5 + random.random())
+			parse_url = token_url + f'?subcatid=0&size=50&start={0}&col=3&order=desc'
+			web_driver.get(parse_url)
+			print(parse_url)
+			time.sleep(3 + random.random())
+			source_doc = html.fromstring(web_driver.page_source)
+			tr_elements = source_doc.xpath("//tbody/tr")
+			for tr in tr_elements:
+				address = ''
+				name_tag = ''
+				if tr.xpath(".//td/a/@href"):
+					address = tr.xpath(".//td/a/@href")[0].split('/')[2]
+				if tr.xpath(".//td/a/div/span/text()"):
+					name_tag = tr.xpath(".//td/a/div/span/text()")
+				name_tag = ''.join(name_tag)
+				data = {
+					'label_name': label_name,
+					'address': address,
+					'address_type': "token",
+					'name_tag': name_tag,
+					'chain_code': 'BSC'
+				}
+				write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
+		
+		if token_cnt > 50:
+			page_cnt = math.ceil(token_cnt / 100)
+			limit = 100
+			for page in range(1, page_cnt + 1):
+				time.sleep(0.4 + random.random())
+				parse_url = token_url + f'?subcatid=0&size=100&start={limit}&col=3&order=desc'
+				web_driver.get(parse_url)
+				print(parse_url)
+				limit += 100
+				time.sleep(3 + random.random())
+				source_doc = html.fromstring(web_driver.page_source)
+				tr_elements = source_doc.xpath("//tbody/tr")
+				for tr in tr_elements:
+					address = ''
+					name_tag = ''
+					if tr.xpath(".//td/a/@href"):
+						address = tr.xpath(".//td/a/@href")[0].split('/')[2]
+					if tr.xpath(".//td/a/div/span/text()"):
+						name_tag = tr.xpath(".//td/a/div/span/text()")
+					name_tag = ''.join(name_tag)
+					data = {
+						'label_name': label_name,
+						'address': address,
+						'address_type': "token",
+						'name_tag': name_tag,
+						'chain_code': 'BSC'
+					}
+					write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
 
 
 def get_label_diff_list(current_file_path, old_file_path):
@@ -198,37 +260,17 @@ def get_label_diff_list(current_file_path, old_file_path):
 	spark.stop()
 	print(Fore.RED + 'Get_label_diff_list() method execute complete',
 		  time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
+	
+	
+def main():
+	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
+	bscscan_all_label = get_bsc_scan_all_label()
+	print(f'GET BscScanCloud.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
+	write_label_to_csv(bscscan_all_label, write_to_label_csv_path)
+	get_address_label_detail(f'./csvFile/{get_time()}-label.csv')
+	print('bscScanCloudLabel execute complete !')
 
 
 if __name__ == '__main__':
-	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
-	# bscscan_all_label = get_bsc_scan_all_label()
-	# print(f'GET BscScanCloud.io take time: {timeit.timeit(get_bsc_scan_all_label, number=1)} s')
-	# write_label_to_csv(bscscan_all_label, write_to_label_csv_path)
-	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
 	
-	# get_address_label_detail('./csvFile/2024-01-30-label.csv')
-	
-	current_df = pd.read_csv('./csvFile/2024-01-30-label.csv')
-	select_column = ['label_name', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
-	token_df = current_df[select_column].dropna(subset=['token_url'])
-	web_driver = seleniumUtils.get_selenium_chrome_driver()
-	web_driver.get("https://bscscan.com/labelcloud")
-	time.sleep(5)
-	for i in token_df.index:
-		label_name = token_df.loc[i, 'label_name']
-		token_url = token_df.loc[i, 'token_url']
-		token_cnt = token_df.loc[i, 'token_cnt']
-		if token_cnt <= 99:
-			time.sleep(0.5 + random.random())
-			parse_url = token_url + f'?subcatid=0&size=100&start={0}&col=3&order=desc'
-			web_driver.get(parse_url)
-			print(parse_url)
-			time.sleep(3 + random.random())
-			source_doc = html.fromstring(web_driver.page_source)
-			tr_elements = source_doc.xpath("//tbody/tr")
-			for tr in tr_elements:
-				address = tr.xpath(".//td/a/@href")
-				name_tag = tr.xpath(".//td/a/div/span/text()")
-				print(address, " ----> ", name_tag)
-			
+	main()

@@ -1,5 +1,0 @@
-label_name,cnt,is_read,account_url,token_url,account_cnt,token_cnt
-0x Protocol,3,0,https://bscscan.com/accounts/label/0x-protocol,,3,
-BscSwap,728,0,https://bscscan.com/accounts/label/bscswap,https://bscscan.com/tokens/label/bscswap,727,1
-Wallet App,53,0,,https://bscscan.com/tokens/label/wallet-app,,53
-Yield Farming,400,0,https://bscscan.com/accounts/label/yield-farming,https://bscscan.com/tokens/label/yield-farming,1,399
