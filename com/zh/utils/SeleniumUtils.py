@@ -16,7 +16,13 @@ class seleniumUtils:
 		# chrome_options.add_argument('--headless')
 		# 关闭自动化测试显示
 		chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
+		# 禁用Blink运行时
 		chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+		# 屏蔽保存密码提示框
+		chrome_options.add_experimental_option('prefs', {
+			'credentials_enable_service': False,
+			'profile.password_manager_enable': False
+		})
 		chrome_options.add_argument(f'user-agent={config.base_user_agent}')
 		chrome_options.add_argument('window-size=1920x3000')
 		chrome_options.add_argument(f'Accept={config.base_accept}')
