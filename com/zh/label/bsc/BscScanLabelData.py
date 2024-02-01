@@ -50,7 +50,7 @@ def get_bsc_scan_all_label():
 			'is_read': 0
 		}
 		bsc_root_label_result_list.append(data)
-	
+
 	for label in bsc_root_label_result_list:
 		for url in label['url']:
 			if url.startswith('/accounts'):
@@ -58,7 +58,7 @@ def get_bsc_scan_all_label():
 			if url.startswith('/tokens'):
 				label['token_url'] = f'{config.bscscan_label_base_url}{url}'
 		del label['url']
-	
+
 	for label in bsc_root_label_result_list:
 		for j in label['detail_cnt']:
 			if j.startswith('Accounts'):
@@ -172,14 +172,14 @@ def get_address_label_detail(current_file_path):
 						print(data)
 						write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
 					limit += 100
-					
+
 	# token 类型
 	token_df = current_df[select_column].dropna(subset=['token_url'])
 	for i in token_df.index:
 		label_name = token_df.loc[i, 'label_name']
 		token_url = token_df.loc[i, 'token_url']
 		token_cnt = token_df.loc[i, 'token_cnt']
-		
+
 		if token_cnt <= 50:
 			time.sleep(0.5 + random.random())
 			parse_url = token_url + f'?subcatid=0&size=50&start={0}&col=3&order=desc'
@@ -204,7 +204,7 @@ def get_address_label_detail(current_file_path):
 					'chain_code': 'BSC'
 				}
 				write_dict_2_csv(data, f"./csvFile/{get_time()}-detail.csv")
-		
+
 		if token_cnt > 50:
 			page_cnt = math.ceil(token_cnt / 100)
 			limit = 100
@@ -239,7 +239,7 @@ def get_label_diff_list(current_file_path, old_file_path):
 	spark = SparkSession.builder.config("spark.driver.extraJavaOptions", "-Dfile.encoding=UTF-8").appName(
 		"readCsv").getOrCreate()
 	sc.setLogLevel("WARN")
-	
+
 	spark.read.csv(current_file_path, header=True, inferSchema=True).createOrReplaceTempView("current_label")
 	spark.read.csv(old_file_path, header=True, inferSchema=True).createOrReplaceTempView("old_label")
 	result_label = spark.sql("""-- noinspection SqlResolveForFile
@@ -262,13 +262,11 @@ def get_label_diff_list(current_file_path, old_file_path):
 			) as t1
 			where t1.account_url is not null and t1.token_url is not null 
 		""")
-	result_label.coalesce(1).toPandas().to_csv(f'./csvFile/{get_time()}-diff-label.csv', mode='w',
-											   header=result_label.columns, index=False)
+	result_label.coalesce(1).toPandas().to_csv(f'./csvFile/{get_time()}-diff-label.csv', mode='w', header=result_label.columns, index=False)
 	spark.stop()
-	print(Fore.RED + 'Get_label_diff_list() method execute complete',
-		  time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
-	
-	
+	print(Fore.RED + 'Get_label_diff_list() method execute complete', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())) + Fore.RESET)
+
+
 def main():
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
 	bscscan_all_label = get_bsc_scan_all_label()
@@ -279,5 +277,4 @@ def main():
 
 
 if __name__ == '__main__':
-	
 	main()
