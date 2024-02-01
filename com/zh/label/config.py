@@ -1,6 +1,9 @@
+import getpass
+
+
 class config:
     # 本地计算机名称,需要调用本地的浏览器进行访问
-    local_user_name: str = 'han.zhou'
+    local_user_name: str = f'{getpass.getuser()}'
     # 初始url
     ethscan_label_base_url: str = 'https://etherscan.io'
     bscscan_label_base_url: str = 'https://bscscan.com'

@@ -17,6 +17,7 @@ from com.zh.utils.FileUtils import get_user_agent
 from datetime import datetime
 from pyspark.sql import session, SparkSession
 from com.zh.utils.SeleniumUtils import seleniumUtils
+from tqdm.autonotebook import tqdm
 
 user_agent_path = '../../resource/agents.txt'
 # explicitly changed encoding to utf-8
@@ -78,7 +79,10 @@ def write_label_to_csv(label_list, label_path):
 			column_name = ['label_name', 'cnt', 'is_read', 'account_url', 'token_url', 'account_cnt', 'token_cnt']
 			writer = csv.DictWriter(f, fieldnames=column_name)
 			writer.writeheader()
-			[writer.writerow(row) for row in label_list]
+			tq = tqdm(label_list, desc='write to csv', ncols=100, ascii=True)
+			for i in tq:
+				writer.writerow(i)
+				tq.set_postfix({'label_name': i['label_name']})
 		print(Fore.RED+f'label list write to csv -> {label_path}'+Fore.RESET)
 	else:
 		print(f'{label_path}{"is exists !"}')
