@@ -1,5 +1,7 @@
 import os.path
 import time
+import timeit
+
 import requests
 import re
 import csv
@@ -145,10 +147,15 @@ if __name__ == '__main__':
 	# ethscan_all_label = get_ethscan_all_label()
 	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
 	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
-	get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
+	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
+	
+	current_csv_pd = pd.read_csv('./csvFile/2024-02-05-label')
+	init_csv_pd = pd.read_csv('./csvFile/init_label.csv')
+	
+	
+	
 
-	get_address_label_detail('./csvFile/2024-01-29-label')
-
+	# get_address_label_detail('./csvFile/2024-01-29-label')
 	# read_csv_df = pd.read_csv(write_to_label_csv_path)
 	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
 	# account_df = read_csv_df[select_column].dropna(subset=['account_url'])

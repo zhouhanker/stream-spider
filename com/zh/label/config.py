@@ -28,3 +28,6 @@ class config:
     edge_user_data_dir: str = rf"user-data-dir=C:\Users\{local_user_name}\AppData\Local\Microsoft\Edge\User Data"
     # 间隔时间
     over_time: int = 5
+    
+    remote_user_name: str = 'root'
+    remote_user_password: str = 'root'

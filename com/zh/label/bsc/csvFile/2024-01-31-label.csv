@@ -1,0 +1,3 @@
+label_name,cnt,is_read,account_url,token_url,account_cnt,token_cnt
+Yield Farming,400,0,https://bscscan.com/accounts/label/yield-farming,https://bscscan.com/tokens/label/yield-farming,1,399
+Wormhole,64,0,https://bscscan.com/accounts/label/wormhole,https://bscscan.com/tokens/label/wormhole,33,31
