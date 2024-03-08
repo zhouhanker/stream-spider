@@ -13,7 +13,7 @@ etherum_dir="/soft/etherum"
 etherum_consensus_dir="$etherum_dir/consensus"
 etherum_execution_dir="$etherum_dir/execution"
 jwt_hex="$etherum_dir/jwt.hex"
-prysm_data_path="$etherum_consensus_dir/prysm_data/"
+prysm_data_path="$etherum_consensus_dir/prysm-data/"
 geth_data_path="$etherum_execution_dir/data/"
 geth_log_path="$etherum_dir/geth.log"
 prysm_log_path="$etherum_dir/prysm.log"
@@ -21,8 +21,27 @@ prysm_log_path="$etherum_dir/prysm.log"
 
 start_etherum(){
   echo "Etherum Node start Run Geth And Prysm ..."
-  nohup $etherum_execution_dir/geth --datadir $geth_data_path --syncmode snap --gcmode archive --txlookuplimit 0 --cache 30000 --maxpeers 9999 --maxpendpeers 100 --http --http.addr $local_host --http.port $http_port --http.api eth,net,engine,admin,web3 --verbosity 3 --authrpc.addr $local_host --authrpc.port $auth_rpc_port --authrpc.vhosts $local_host --authrpc.jwtsecret $jwt_hex >$geth_log_path 2>&1 &
-  nohup sh $etherum_consensus_dir/prysm.sh beacon-chain --execution-endpoint=http://$local_host:$auth_rpc_port --jwt-secret=$jwt_hex --datadir $prysm_data_path --accept-terms-of-use=true --block-batch-limit 5 > $prysm_log_path 2>&1 &
+  nohup $etherum_execution_dir/geth \
+  --datadir $geth_data_path \
+  --syncmode snap --gcmode archive \
+  --txlookuplimit 0 --cache 30000 \
+  --maxpeers 9999 \
+  --maxpendpeers 100 \
+  --http --http.addr $local_host \
+  --http.port $http_port \
+  --http.api eth,net,engine,admin,web3 \
+  --verbosity 3 \
+  --authrpc.addr $local_host \
+  --authrpc.port $auth_rpc_port \
+  --authrpc.vhosts $local_host \
+  --authrpc.jwtsecret $jwt_hex >$geth_log_path 2>&1 &
+
+  nohup sh $etherum_consensus_dir/prysm.sh \
+  beacon-chain --execution-endpoint=http://$local_host:$auth_rpc_port \
+  --jwt-secret=$jwt_hex \
+  --datadir $prysm_data_path \
+  --accept-terms-of-use=true \
+  --block-batch-limit 5 > $prysm_log_path 2>&1 &
   echo "Geth And Prysm Running ......"
 }
 
