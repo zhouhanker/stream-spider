@@ -41,7 +41,7 @@ class seleniumUtils:
 
 		# 忽略 SSL 证书错误，允许访问使用无效证书的网站
 		chrome_options.add_argument('--ignore-certificate-errors')
-		chrome_options.add_argument('--disable-gpu')
+		# chrome_options.add_argument('--disable-gpu')
 		chrome_driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
 		chrome_driver.implicitly_wait(config.over_time)
 		chrome_driver.maximize_window()

@@ -144,13 +144,13 @@ def get_label_diff_list(current_file_path, old_file_path):
 
 if __name__ == '__main__':
 	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
-	# ethscan_all_label = get_ethscan_all_label()
-	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
-	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
-	# get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
+	ethscan_all_label = get_ethscan_all_label()
+	print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
+	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
 	
-	current_csv_pd = pd.read_csv('./csvFile/2024-02-05-label')
-	init_csv_pd = pd.read_csv('./csvFile/init_label.csv')
+	# current_csv_pd = pd.read_csv('./csvFile/2024-02-05-label')
+	# init_csv_pd = pd.read_csv('./csvFile/init_label.csv')
 	
 	
 	

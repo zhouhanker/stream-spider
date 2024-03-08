@@ -23,8 +23,7 @@ from com.zh.utils.RemoteHostUtils import RemoteHostUtils
 
 
 if __name__ == '__main__':
-	remote_path = '/root'
-	host = '192.168.213.138'
-	directory = RemoteHostUtils.inspect_remote_file(host, remote_path)
-	for item in directory:
-		print(item)
+	web_driver = seleniumUtils.get_selenium_chrome_driver()
+	web_driver.get('https://bot.sannysoft.com/')
+	input(Fore.LIGHTRED_EX + "Have you entered the first page? Please enter any character: \n" + Fore.RESET)
+	print(web_driver.page_source)
