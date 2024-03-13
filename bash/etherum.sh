@@ -4,7 +4,7 @@
 # author: 2024 han.zhou
 
 # generate jwt
-# openssl rand -hex 32 | tr -d "\n" > "jwt.hex"
+# openssl rand -hex 32 | tr -d "\n" > "jwt.hex" or ./prysm.sh beacon-chain generate-auth-secret
 
 local_host=$(ifconfig | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}')
 http_port=8545
@@ -31,17 +31,19 @@ start_etherum(){
   --http.port $http_port \
   --http.api eth,net,engine,admin,web3 \
   --verbosity 3 \
-  --authrpc.addr $local_host \
+  --authrpc.addr localhost \
   --authrpc.port $auth_rpc_port \
-  --authrpc.vhosts $local_host \
+  --authrpc.vhosts localhost \
   --authrpc.jwtsecret $jwt_hex >$geth_log_path 2>&1 &
 
   nohup sh $etherum_consensus_dir/prysm.sh \
-  beacon-chain --execution-endpoint=http://$local_host:$auth_rpc_port \
+  beacon-chain --execution-endpoint=http://localhost:$auth_rpc_port \
   --jwt-secret=$jwt_hex \
   --datadir $prysm_data_path \
   --accept-terms-of-use=true \
-  --block-batch-limit 5 > $prysm_log_path 2>&1 &
+  --checkpoint-sync-url=https://beaconstate.info \
+  --genesis-beacon-api-url=https://beaconstate.info \
+  --block-batch-limit 10 > $prysm_log_path 2>&1 &
   echo "Geth And Prysm Running ......"
 }
 
