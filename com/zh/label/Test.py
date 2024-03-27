@@ -1,29 +1,52 @@
 import time
 
+import itchat
 import requests
-import paramiko
-import pandas as pd
-from colorama import Fore
 from curl_cffi import requests
-from com.zh.utils.SeleniumUtils import seleniumUtils
-from com.zh.label.config import config
-import httpx
-from com.zh.utils.RemoteHostUtils import RemoteHostUtils
 
 
-# url = "http://192.168.213.138:8191/v1"
-# headers = {"Content-Type": "application/json"}
-# data = {
-#     "cmd": "request.get",
-#     "url": "https://etherscan.io/labelcloud",
-#     "maxTimeout": 60000
-# }
-# response = requests.post(url, headers=headers, json=data)
-# print(response.text)
+def create_task(url, proxy):
+	data = {
+		"clientKey": "92b07c31fce1eab8236afd9c99092727f55d0b0034215",
+		"task": {
+			"type": "CloudFlareTaskS1",
+			"websiteURL": url,
+			"proxy": proxy
+		}
+	}
+	url = "https://api.yescaptcha.com/createTask"
+	create_task_response = requests.post(url, json=data).json()
+	return create_task_response
+
+
+def get_task(task_id):
+	url = "http://api.yescaptcha.com/getTaskResult"
+	data = {
+		# 填您自己的密钥
+		"clientKey": "92b07c31fce1eab8236afd9c99092727f55d0b0034215",
+		"taskId": task_id
+	}
+	get_task_response = requests.post(url, json=data).json()
+	return get_task_response
+
+
+def get_result(*args, **kwargs):
+	uuid = create_task(*args, **kwargs)
+	if not uuid or not uuid.get('taskId'):
+		return uuid
+	print("TaskID:", uuid)
+	for i in range(30):
+		time.sleep(3)
+		result = get_task(uuid.get('taskId'))
+		if result.get('status') == 'processing':
+			continue
+		elif result.get('status') == 'ready':
+			return result
+		else:
+			print("Fail:", result)
 
 
 if __name__ == '__main__':
-	web_driver = seleniumUtils.get_selenium_chrome_driver()
-	web_driver.get('https://bot.sannysoft.com/')
-	input(Fore.LIGHTRED_EX + "Have you entered the first page? Please enter any character: \n" + Fore.RESET)
-	print(web_driver.page_source)
+	itchat.auto_login(hotReload=True)
+	itchat.send('Hello, filehelper', toUserName='filehelper')
+	

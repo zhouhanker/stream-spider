@@ -53,21 +53,21 @@ def simulate_execution(tx: dict):
 
 
 if __name__ == '__main__':
-    # asyncio.run(get_eth_tx_detail())
-    current_block = web3.eth.get_block('latest')
-    base_fee = current_block['baseFeePerGas'] * 2
-    transaction = {
-        'from': web3.to_checksum_address('0x1ccc30a58dfffc6934592fa78b5ec1bf83cdade5'),  # 发送方地址
-        'to': web3.to_checksum_address('0x65f7ba4ec257af7c55fd5854e5f6356bbd0fb8ec'),  # 接收方地址或合约地址
-        'nonce': '0x2df',
-        'value': 0x0,  # 发送的以太币数量
-        'gas': base_fee,  # Gas限制
-        'gasPrice': 0x690fbccd4,  # Gas价格
-        'data': '0x9ee679e800000000000000000000000000000000000000000000001cce0725ee5d851e69',  # 调用数据，如果是合约调用
-        'chainId': 1  # 链ID，主网为1
-    }
-    execution = simulate_execution(transaction)
-    execution.hex()
+    asyncio.run(get_eth_tx_detail())
+    # current_block = web3.eth.get_block('latest')
+    # base_fee = current_block['baseFeePerGas'] * 2
+    # transaction = {
+    #     'from': web3.to_checksum_address('0x1ccc30a58dfffc6934592fa78b5ec1bf83cdade5'),  # 发送方地址
+    #     'to': web3.to_checksum_address('0x65f7ba4ec257af7c55fd5854e5f6356bbd0fb8ec'),  # 接收方地址或合约地址
+    #     'nonce': '0x2df',
+    #     'value': 0x0,  # 发送的以太币数量
+    #     'gas': base_fee,  # Gas限制
+    #     'gasPrice': 0x690fbccd4,  # Gas价格
+    #     'data': '0x9ee679e800000000000000000000000000000000000000000000001cce0725ee5d851e69',  # 调用数据，如果是合约调用
+    #     'chainId': 1  # 链ID，主网为1
+    # }
+    # execution = simulate_execution(transaction)
+    # execution.hex()
     
     
     

@@ -31,3 +31,5 @@ class config:
     
     remote_user_name: str = 'root'
     remote_user_password: str = 'root'
+    
+    dingtalk_robot_access_token: str = ''
