@@ -1,8 +1,8 @@
 import time
 
-import itchat
 import requests
 from curl_cffi import requests
+from DrissionPage import ChromiumPage, ChromiumOptions
 
 
 def create_task(url, proxy):
@@ -47,6 +47,9 @@ def get_result(*args, **kwargs):
 
 
 if __name__ == '__main__':
-	itchat.auto_login(hotReload=True)
-	itchat.send('Hello, filehelper', toUserName='filehelper')
+	chrome_exe_path = f"C:\Program Files\Google\Chrome\Application\chrome.exe"
+	co = ChromiumOptions().set_browser_path(chrome_exe_path)
+	page = ChromiumPage(co)
+	resp = page.get("https://etherscan.io/labelcloud")
+	print(page.html)
 	

@@ -32,4 +32,5 @@ class config:
     remote_user_name: str = 'root'
     remote_user_password: str = 'root'
     
-    dingtalk_robot_access_token: str = ''
+    dingtalk_robot_access_token: str = '0de229733f63bd5cbc8195c9dec27e48d3a2921c5e4cb522cbbd8031f6ce9d53'
+    zenrows_key: str = '76450f664162b12604a4b3a112349ec5202f69ed'

@@ -24,13 +24,14 @@ os.system('chcp 65001')
 # 获取ethscanCloud中的所有标签 只获取account标签和token标签
 def get_ethscan_all_label():
 	ethscan_cloud_url = f'{config.ethscan_label_base_url}{"/labelcloud"}'
-	headers = {
-		'User-Agent': get_user_agent(user_agent_path),
-		'Accept': config.base_accept,
-		'cookie': "etherscan_offset_datetime=+8; __stripe_mid=2284c985-abe9-47bc-a3dc-f6dd186fc50be372c7; etherscan_pwd=4792:Qdxb:ZQoxE7hwxuZ8IpB6V/Xg8t0SlBUyo6OYxvYH8fDRMes=; etherscan_userid=zhouhan; etherscan_autologin=True; __cflb=0H28vPcoRrcznZcNZSuFrvaNdHwh858XnsnowBrTHkg; _gid=GA1.2.310546296.1705468157; cf_clearance=PdguUBeWn1Sn1tw15OKm7ZbL0QJJZAHIgtyL7p2zxqU-1705470525-1-ATSdy4t/5ezAXkitP/R93VBYUbO3CxCKXqokYv6+LcDUBZPaWg0GBMwmJyrV76nq7ffaIObbRSRVeUNeL3hm8Wk=; cf_chl_rc_ni=7; cf_chl_3=be16dc3cc6971e3; ASP.NET_SessionId=u5w4xt52ozihhnocoohpqlwk; _ga_T1JC9RNQXV=GS1.1.1705482596.4.1.1705484391.59.0.0; _ga=GA1.2.1989122975.1705296681; _gat_gtag_UA_46998878_6=1"
+	params = {
+		'url': ethscan_cloud_url,
+		'apikey': config.zenrows_key,
+		'js_render': 'true',
+		'js_instructions': """[{"click":".selector"},{"wait":500},{"fill":[".input","value"]},{"wait_for":".slow_selector"}]""",
 	}
 	eth_root_label_result_list = []
-	label_resp = requests.get(ethscan_cloud_url, headers=headers).text
+	label_resp = requests.get('https://api.zenrows.com/v1/', params=params).text
 	eth_root = html.fromstring(label_resp)
 	select_div = eth_root.xpath("//div[@class='col-md-4 col-lg-3 mb-3 secondary-container']")
 	for div in select_div:
@@ -143,28 +144,14 @@ def get_label_diff_list(current_file_path, old_file_path):
 
 
 if __name__ == '__main__':
-	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label"}'
+	write_to_label_csv_path = f'./csvFile/{get_time()}{"-label.csv"}'
 	ethscan_all_label = get_ethscan_all_label()
-	print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
-	write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
-	get_label_diff_list(write_to_label_csv_path, 'csvFile/init_label.csv')
-	
+	# print(f'GET Ethscan.io take time: {timeit.timeit(get_ethscan_all_label, number=1)} s')
+	# write_label_to_csv(ethscan_all_label, write_to_label_csv_path)
+	# get_label_diff_list(write_to_label_csv_path,"../eth/csvFile/init_label.csv")
+	for i in ethscan_all_label:
+		print(i)
 	# current_csv_pd = pd.read_csv('./csvFile/2024-02-05-label')
 	# init_csv_pd = pd.read_csv('./csvFile/init_label.csv')
 	
 	
-	
-
-	# get_address_label_detail('./csvFile/2024-01-29-label')
-	# read_csv_df = pd.read_csv(write_to_label_csv_path)
-	# select_column = ['label_name', 'cnt', 'is_read', 'account_url']
-	# account_df = read_csv_df[select_column].dropna(subset=['account_url'])
-	# for i in account_df.index:
-	# 	labelName = account_df.loc[i, 'label_name']
-	# 	cnt = account_df.loc[i, 'cnt']
-	# 	is_read = account_df.loc[i, 'is_read']
-	# 	account_url = account_df.loc[i, 'account_url']
-	# 	print(i, labelName, cnt, is_read, account_url)
-	# 	time.sleep(0.5 + random.random())
-	# 	web_driver.get(account_url)
-	# 	time.sleep(3)
